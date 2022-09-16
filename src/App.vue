@@ -9,7 +9,9 @@ import ChinaMap from './components/ChinaMap.vue'
       <span class="text-4xl font-bold">全国新冠肺炎疫情数据地图</span>
     </div>
     <div class="flex-1">
-      <ChinaMap />
+      <Suspense>
+        <ChinaMap />
+      </Suspense>
     </div>
   </div>
 </template>

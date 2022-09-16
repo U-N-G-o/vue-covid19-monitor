@@ -1,14 +1,13 @@
 <script setup>
 import chinaMapJson from '../assets/json/china.json'
-import listJson from '../assets/json/list.json'
 import { ref, getCurrentInstance, onMounted } from 'vue'
+import fetch from '../utils/fetch';
+
+/** 通过网易提供接口：https://c.m.163.com/ug/api/wuhan/app/data/list-total 获取疫情数据 */
+const list = await fetch('GET', '/ug/api/wuhan/app/data/list-total').then(res => res.data.data)
 
 const chinaMap = ref()
 const {proxy: { $echarts }} = getCurrentInstance()
-
-const list = JSON.parse(JSON.stringify(listJson))
-
-const chinaData = list.data.areaTree.find(item => item.name === '中国')
 
 /** 格式化接口中的 name 数据 */
 const formatName = (name) => {
@@ -35,8 +34,15 @@ const formatName = (name) => {
   }
 }
 
+onMounted(async() => {
+  drawMap()
+});
+
+/** 筛选出中国的数据 */
+const chinaData = list.areaTree.find(item => item.name === '中国')
+
 /** 各地区的确诊人数 */
-const confirmData = chinaData.children.map(item => {
+const confirmData = chinaData?.children.map(item => {
   const { total: { confirm, heal, dead } } = item
   return {
     name: formatName(item.name),
@@ -44,10 +50,6 @@ const confirmData = chinaData.children.map(item => {
     value: confirm - heal - dead
   }
 })
-
-onMounted(() => {
-  drawMap()
-});
 
 function drawMap() {
   const myChart = $echarts.init(chinaMap.value)
