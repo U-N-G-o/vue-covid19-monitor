@@ -4,7 +4,6 @@ const baseUrl = '/list'
 
 const fetch = (method = 'GET', url, param = '') => {
   const fetchUrl = baseUrl + url
-  console.log('fetchUrl', fetchUrl)
   return new Promise((resolve, reject) => {
     axios({
       method,
