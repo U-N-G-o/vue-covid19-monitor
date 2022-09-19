@@ -1,51 +1,24 @@
 <script setup>
 import chinaMapJson from '../assets/json/china.json'
 import { ref, getCurrentInstance, onMounted } from 'vue'
-import fetch from '../utils/fetch';
+import { formatProvinceName } from '../utils/formatter'
 
-/** 通过网易提供接口：https://c.m.163.com/ug/api/wuhan/app/data/list-total 获取疫情数据 */
-const list = await fetch('GET', '/ug/api/wuhan/app/data/list-total').then(res => res.data.data)
+const props = defineProps({
+  chinaMapData: Array,
+})
 
 const chinaMap = ref()
 const {proxy: { $echarts }} = getCurrentInstance()
 
-/** 格式化接口中的 name 数据 */
-const formatName = (name) => {
-  switch(name) {
-    case '上海':
-    case '北京':
-    case '天津':
-    case '重庆':
-      return name + '市';
-    case '西藏':
-    case '内蒙古':
-      return name + '自治区';
-    case '新疆':
-      return name + '维吾尔自治区';
-    case '广西':
-      return name + '壮族自治区';
-    case '宁夏':
-      return name + '回族自治区';
-    case '香港':
-    case '澳门':
-      return name + '特别行政区'
-    default:
-      return name + '省'
-  }
-}
-
-onMounted(async() => {
+onMounted(() => {
   drawMap()
 });
 
-/** 筛选出中国的数据 */
-const chinaData = list.areaTree.find(item => item.name === '中国')
-
 /** 各地区的确诊人数 */
-const confirmData = chinaData?.children.map(item => {
+const confirmData = props.chinaMapData?.children.map(item => {
   const { total: { confirm, heal, dead } } = item
   return {
-    name: formatName(item.name),
+    name: formatProvinceName(item.name),
     /** 现有确诊 = 确诊人数 - 治愈人数 - 死亡人数 */
     value: confirm - heal - dead
   }
@@ -58,14 +31,14 @@ function drawMap() {
     geo: {
       map: 'china',
       roam: true, //是否允许缩放，拖拽
-      zoom: 1.5, //初始化大小
+      zoom: 1.4, //初始化大小
       //缩放大小限制
       scaleLimit: {
         min: 1, //最小
         max: 2, //最大
       },
       //设置中心点
-      center: [108, 35],
+      center: [104, 35],
       itemStyle: {
         areaColor: '#1af9e5',
         color: 'red',
@@ -84,7 +57,7 @@ function drawMap() {
       trigger: 'item',
     },
     visualMap: {
-      left: 'right',
+      left: 'left',
       type: 'piecewise',
       pieces: [
         {min: 10000, color: '#a50026' },
