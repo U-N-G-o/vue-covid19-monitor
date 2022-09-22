@@ -6,9 +6,7 @@ import TrendChart from '../components/TrendChart.vue';
 </script>
 
 <template>
-  <div class="h-full flex flex-col px-[10px]">
-    <suspense>
-      <TrendChart :china-day-list="props.chinaDayList" />
-    </suspense>
+  <div class="h-full flex flex-col">
+    <TrendChart :china-day-list="props.chinaDayList" />
   </div>
 </template>
