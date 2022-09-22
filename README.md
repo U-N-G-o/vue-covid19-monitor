@@ -1,7 +1,34 @@
-# Vue 3 + Vite
+# 项目简介
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+该项目目的是实现一个用于大屏的中国疫情地图，实时数据来自网易新闻提供的[接口](https://c.m.163.com/ug/api/wuhan/app/data/list-total)，技术栈采用 `Vue3`、 `element-plus`、 `tailwindCss` 以及 `echart`
 
-## Recommended IDE Setup
+## 目录结构
 
-- [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar)
+```
+├─assets
+│  └─json // 存放echarts所需中国地图的json文件 
+├─components // echart 组件
+├─hooks // 抽取可复用逻辑、状态
+├─utils // 工具函数
+└─views // 视图组件
+```
+
+## 代理
+
+为解决跨域问题，在本地起了一个 node 代理，主要代码如下
+
+```
+import express from 'express'
+import { createProxyMiddleware } from 'http-proxy-middleware'
+const app = express()
+
+app.use('/list', createProxyMiddleware({
+  target: 'https://c.m.163.com',
+  changeOrigin: true,
+  pathRewrite: {
+    '^/list': ''
+  },
+}))
+
+app.listen(3000)
+```
